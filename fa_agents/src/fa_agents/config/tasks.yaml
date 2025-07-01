@@ -1,17 +1,13 @@
-research_task:
+generate_change_requests:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
+    Analise as notas de reunião (transcrição e highlights) e, com base na especificação funcional atual, identifique e gere change requests conforme o padrão do projeto.
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    Arquivos markdown de change request, um para cada alteração identificada, nomeados pelo respectivo ID, conforme exemplos em /knowledge/samples/CRs_samples, salvos em /outputs/change_requests.
+  agent: requirements_analyst_1
 
-reporting_task:
+update_spec_and_changelog:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Analise os change requests gerados e a especificação funcional atual, identifique os pontos da especificação que devem ser atualizados e gere sugestões de alteração. Gere também um changelog conforme o padrão do projeto.
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    Arquivo markdown com a lista de alterações sugeridas na especificação funcional, salvo em /outputs/. Arquivo de changelog em markdown conforme exemplos em /knowledge/samples/CL_samples, salvo em /outputs/.
+  agent: requirements_analyst_2

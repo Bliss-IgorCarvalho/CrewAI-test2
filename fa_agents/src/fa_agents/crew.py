@@ -1,7 +1,13 @@
 from crewai import Agent, Crew, Process, Task
-from crewai.project import CrewBase, agent, crew, task
+from crewai.project import CrewBase, agent, crew, task, tool
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
+from fa_agents.tools.requirements_tools import (
+    FunctionalSpecReaderTool,
+    MeetingNotesReaderTool,
+    ChangeRequestWriterTool,
+    ChangelogWriterTool
+)
 # If you want to run a snippet of code before or after the crew starts,
 # you can use the @before_kickoff and @after_kickoff decorators
 # https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
@@ -13,52 +19,61 @@ class FaAgents():
     agents: List[BaseAgent]
     tasks: List[Task]
 
-    # Learn more about YAML configuration files here:
-    # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-    # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-    
-    # If you would like to add tools to your agents, you can learn more about it here:
-    # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
-    def researcher(self) -> Agent:
+    def requirements_analyst_1(self) -> Agent:
         return Agent(
-            config=self.agents_config['researcher'], # type: ignore[index]
+            config=self.agents_config['requirements_analyst_1'], 
             verbose=True
         )
 
     @agent
-    def reporting_analyst(self) -> Agent:
+    def requirements_analyst_2(self) -> Agent:
         return Agent(
-            config=self.agents_config['reporting_analyst'], # type: ignore[index]
+            config=self.agents_config['requirements_analyst_2'], 
             verbose=True
         )
 
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
     @task
-    def research_task(self) -> Task:
+    def generate_change_requests(self) -> Task:
         return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
+            config=self.tasks_config['generate_change_requests'], 
         )
 
     @task
-    def reporting_task(self) -> Task:
+    def update_spec_and_changelog(self) -> Task:
         return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
+            config=self.tasks_config['update_spec_and_changelog'], 
         )
+
+    @tool
+    def functional_spec_reader(self):
+        return FunctionalSpecReaderTool()
+
+    @tool
+    def meeting_notes_reader(self):
+        return MeetingNotesReaderTool()
+
+    @tool
+    def change_request_writer(self):
+        return ChangeRequestWriterTool()
+
+    @tool
+    def changelog_writer(self):
+        return ChangelogWriterTool()
 
     @crew
     def crew(self) -> Crew:
         """Creates the FaAgents crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
+        tools = {
+            'functional_spec_reader': FunctionalSpecReaderTool,
+            'meeting_notes_reader': MeetingNotesReaderTool,
+            'change_request_writer': ChangeRequestWriterTool,
+            'changelog_writer': ChangelogWriterTool,
+        }
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=self.agents, 
+            tasks=self.tasks, 
+            tools=tools,
             process=Process.sequential,
             verbose=True,
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )
