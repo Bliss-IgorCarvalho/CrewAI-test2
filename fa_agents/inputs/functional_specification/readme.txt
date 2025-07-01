@@ -1,0 +1,1 @@
+Especificação funcional app SAPO - MVP - Versão em produção
